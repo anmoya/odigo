@@ -1,6 +1,7 @@
 import express from "express";
 
 import testRouter from "./routes/test";
+import userRouter from "./routes/user"
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.get("/healtcheck", (_req, res) => {
 });
 
 app.use("/api/test", testRouter);
+app.use("/api/user", userRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
