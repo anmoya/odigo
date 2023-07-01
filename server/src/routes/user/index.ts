@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { getAllUsers } from "../../services/user";
-import { validate } from "../../utils/zodvalidator";
-import {pagedRequestSchema} from './typings/request.schemas'
+import {pagedRequestSchema} from '../../schema/pagedQuey.schema'
+import { validate } from "../../validators/zodvalidator";
 
 const router = express.Router()
 
