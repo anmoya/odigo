@@ -1,7 +1,7 @@
-import express from "express";
+import express, { Request, Response } from "express";
 
 import testRouter from "./routes/test";
-import userRouter from "./routes/user"
+import userRouter from "./routes/user";
 
 const app = express();
 
@@ -9,7 +9,7 @@ app.use(express.json());
 
 const PORT = 3000;
 
-app.get("/healtcheck", (_req, res) => {
+app.get("/healtcheck", (_req: Request, res: Response) => {
   console.log("ok");
   res.send("healty");
 });

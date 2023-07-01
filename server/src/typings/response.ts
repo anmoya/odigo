@@ -5,8 +5,8 @@ export interface PagedResult<T> {
 }
 
 export interface ApiResponse<T> {
-    data: T,
+    data?: T,
     success: boolean
-    message: string
+    message?: string
     error?: string
 }
