@@ -6,7 +6,12 @@ import {
   getUser,
   updateUser,
 } from "../../services/user";
-import { pagedRequestSchema } from "../../schema/pagedQuery.schema";
+import {
+  deleteUserSchema,
+  getUserSchema,
+  pagedRequestSchema,
+  updateUserSchema,
+} from "./schemas";
 import { validate } from "../../validators/zodvalidator";
 import { ApiResponse } from "../../typings/response";
 import { User } from "@prisma/client";
@@ -46,19 +51,23 @@ router.get(
   }
 );
 
-router.get("/:id", async (req: Request, res: UserResponse) => {
-  const { id } = req.params;
+router.get(
+  "/:id",
+  validate(getUserSchema),
+  async (req: Request, res: UserResponse) => {
+    const { id } = req.params;
 
-  const user = await getUser(parseInt(id));
+    const user = await getUser(parseInt(id));
 
-  if (user === null) return res.status(404).send();
+    if (user === null) return res.status(404).send();
 
-  return res.json({
-    data: user,
-    message: "",
-    success: true,
-  });
-});
+    return res.json({
+      data: user,
+      message: "",
+      success: true,
+    });
+  }
+);
 
 router.post(
   "/",
@@ -80,32 +89,40 @@ router.post(
   }
 );
 
-router.put("/:id", async (req: Request, res: CreateUserResponse) => {
-  const { body, params } = req;
+router.put(
+  "/:id",
+  validate(updateUserSchema),
+  async (req: Request, res: CreateUserResponse) => {
+    const { body, params } = req;
 
-  try {
-    const existingUser = await getUser(parseInt(params.id));
+    try {
+      const existingUser = await getUser(parseInt(params.id));
 
-    if (existingUser === undefined) {
-      return res
-        .status(404)
-        .json({ success: false, message: `User ${params.id} doesn't exists` });
+      if (existingUser === undefined) {
+        return res
+          .status(404)
+          .json({
+            success: false,
+            message: `User ${params.id} doesn't exists`,
+          });
+      }
+
+      const user = await updateUser(parseInt(params.id), body.name, body.email);
+
+      return res.json({
+        data: user,
+        success: true,
+        message: "User updated",
+      });
+    } catch (error) {
+      return res.json({ error: error as string, success: false });
     }
-
-    const user = await updateUser(parseInt(params.id), body.name, body.email);
-
-    return res.json({
-      data: user,
-      success: true,
-      message: "User updated",
-    });
-  } catch (error) {
-    return res.json({ error: error as string, success: false });
   }
-});
+);
 
 router.delete(
   "/:id",
+  validate(deleteUserSchema),
   async (req: Request, res: Response<ApiResponse<User>>) => {
     try {
       const {
@@ -113,12 +130,10 @@ router.delete(
       } = req;
       const removedUser = await deleteUser(parseInt(id));
 
-      return res
-        .status(204)
-        .json({
-          success: true,
-          message: `User ${removedUser.email} was deleted`,
-        });
+      return res.status(204).json({
+        success: true,
+        message: `User ${removedUser.email} was deleted`,
+      });
     } catch (error) {
       return res.json({ error: error as string, success: false });
     }
